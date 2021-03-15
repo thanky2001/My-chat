@@ -1,11 +1,10 @@
-import React, { Component } from 'react'
+import firebase from 'firebase';
 
-export default class Firebase extends Component {
-    render() {
-        return (
-            <div>
-                
-            </div>
-        )
-    }
-}
+const config = {
+    apiKey: "AIzaSyCXjn2HJ0euD_e9uhNG966zv_F69ozJETE",
+    authDomain: "mychat-49839.firebaseapp.com",
+    databaseURL: "https://mychat-49839-default-rtdb.firebaseio.com"
+  };
+  firebase.initializeApp(config);
+  export const auth = firebase.auth;
+  export const db = firebase.database();
