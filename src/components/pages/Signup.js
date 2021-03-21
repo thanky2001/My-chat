@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
-import { signup, signInWithGoogle,signInWithGitHub } from '../helpers/auth';
+import { signup, signInWithGoogle, } from '../helpers/auth';
+import '../../Css/Login.css';
 
 export default class Signup extends Component {
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -11,18 +12,13 @@ export default class Signup extends Component {
       email: '',
       password: '',
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.githubSignIn = this.githubSignIn.bind(this);
-    this.googleSignIn = this.googleSignIn.bind(this);
-    
   }
-  handleChange(event) {
+  handleChange=(event)=>{
     this.setState({
       [event.target.name]: event.target.value
     });
   }
-  async handleSubmit(event) {
+  handleSubmit=async(event)=> {
     event.preventDefault();
     this.setState({ error: '' });
     try {
@@ -31,49 +27,54 @@ export default class Signup extends Component {
       this.setState({ error: error.message });
     }
   }
-  async googleSignIn() {
+  googleSignIn=async()=> {
     try {
       await signInWithGoogle();
     } catch (error) {
       this.setState({ error: error.message });
     }
   }
-  async githubSignIn() {
-    try {
-      await signInWithGitHub();
-    } catch (error) {
-      this.setState({ error: error.message });
-    }
-  }
   render() {
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <h1>
-            Sign Up to
-          <Link to="/">Chatty</Link>
-          </h1>
-          <p>Fill in the form below to create an account.</p>
-          <div>
-            <input placeholder="Email" name="email" type="email" onChange={this.handleChange} value={this.state.email}></input>
+      
+      <div className="wrapper fadeInDown">
+        <div id="formContent">
+          {/* Icon */}
+          <div className="fadeIn first">
+            <img src="./images/avatar.png" id="icon" alt="User Icon" />
           </div>
-          <div>
-            <input placeholder="Password" name="password" onChange={this.handleChange} value={this.state.password} type="password"></input>
+          {/* sign up Form */}
+          <form autoComplete="off" onSubmit={this.handleSubmit}>
+            {this.state.error ? (<p className="text-danger">{this.state.error}</p>) : null}
+            <input 
+              className='fadeIn second'
+              placeholder="Email"
+              name="email"
+              type="email"
+              onChange={this.handleChange}
+              value={this.state.email}>
+            </input>
+            <input
+              className='fadeIn third'
+              placeholder="Password"
+              name="password"
+              onChange={this.handleChange}
+              value={this.state.password}
+              type="password">
+            </input>
+            <input type="submit" className="fadeIn fourth" value="Sign up" />
+            <div className="text-center fadeIn fifth">Or</div>
+            <div className="social-container ">
+              {/* <a href="#" className="social"><i className="fab fa-facebook-f" /></a> */}
+              <a onClick={this.googleSignIn} className="social fadeIn sixth"><i className="fab fa-google-plus-g" /></a>
+              {/* <a href="#" className="social"><i className="fab fa-linkedin-in" /></a> */}
+            </div>
+          </form>
+          {/* Sign in*/}
+          <div id="formFooter">
+            <p>Already have an account? <Link to="/login">Login</Link></p>
           </div>
-          <div>
-            {this.state.error ? <p>{this.state.error}</p> : null}
-            <button type="submit">Sign up</button>
-            <p>Or</p>
-            <button onClick={this.googleSignIn} type="button">
-              Sign up with Google
-            </button>
-            <button type="button" onClick={this.githubSignIn}>
-              Sign up with GitHub
-            </button>
-          </div>
-          <hr></hr>
-          <p>Already have an account? <Link to="/login">Login</Link></p>
-        </form>
+        </div>
       </div>
     )
   }

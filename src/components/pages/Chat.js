@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
 import { auth, db } from '../services/Firebase';
+import { logout } from "../helpers/auth";
+import '../../Css/chat.css';
 
 export default class Chat extends Component {
     constructor(props) {
         super(props);
         //Lấy dữ liệu từ Firebase
         this.state = {
-            user: auth().currentUser,
+            currentUser: auth().currentUser,
+            user: {},
             chats: [],
             content: '',
             readError: null,
             writeError: null
         };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
-    async componentDidMount() {
+    componentDidMount = async () => {
         this.setState({ readError: null });
+        //lấy dữ liệu bảng chats trên firebase => push vào mảng chats
         try {
             db.ref("chats").on("value", snapshot => {
                 let chats = [];
@@ -28,13 +30,28 @@ export default class Chat extends Component {
         } catch (error) {
             this.setState({ readError: error.message });
         }
+        //lấy dữ liệu mảng user
+        try {
+            db.ref("user").on("value", snapshot => {
+                let user = {};
+                snapshot.forEach((snap) => {
+                    if (snap.val().uid === this.state.currentUser.uid) {
+                        user=snap.val()
+                    }
+                });
+                this.setState({ user });
+            
+            });
+        } catch (error) {
+            this.setState({ readError: error.message });
+        }
     }
-    handleChange(event) {
+    handleChange = (event) => {
         this.setState({
             content: event.target.value
         });
     }
-    async handleSubmit(event) {
+    handleSubmit = async (event) => {
         event.preventDefault();
         this.setState({ writeError: null });
         try {
@@ -47,6 +64,10 @@ export default class Chat extends Component {
         } catch (error) {
             this.setState({ writeError: error.message });
         }
+    }
+    logout=() =>{
+        logout();
+        window.location.href = '/';
     }
     chat = () => {
         return this.state.chats.map(chat => {
@@ -75,21 +96,57 @@ export default class Chat extends Component {
     }
     render() {
         return (
-            <div>
-                <div>
-                    Login in as: <strong>{this.state.user.email}</strong>
-                </div>
-                <div className="chat_window">
-                    <div className="top_menu">
-                        <div className="buttons">
-                            <div className="button close" />
-                            <div className="button minimize" />
-                            <div className="button maximize" />
+            // <div>
+            //     <div>
+            //         Login in as: <strong>{this.state.user.email}</strong>
+            //     </div>
+            //     <div className="chat_window">
+            //         <div className="top_menu">
+            //             <div className="buttons">
+            //                 <div className="button close" />
+            //                 <div className="button minimize" />
+            //                 <div className="button maximize" />
+            //             </div>
+            //             <div className="title">Chat</div>
+            //         </div>
+            //         <ul className="messages">{this.chat()}</ul>
+            //         <div className="bottom_wrapper clearfix">
+            //             <form onSubmit={this.handleSubmit}>
+            //                 <div>
+            //                     <input className="message_input_wrapper" placeholder="Type your message here..."
+            //                         onChange={this.handleChange} value={this.state.content}></input>
+            //                     {this.state.error ? <p>{this.state.writeError}</p> : null}
+            //                     <div className="send_message">
+            // <button className="btn--send" type="submit">Send</button>
+            //                     </div>
+            //                 </div>
+            //             </form>
+            //         </div>
+            //     </div>
+            //     <div className="message_template">
+            //         <li className="message">
+            //             <div className="avatar" />
+            //             <div className="text_wrapper">
+            //                 <div className="text" />
+            //             </div>
+            //         </li>
+            //     </div>
+            // </div>
+
+            <div className="container-fluid">
+                <div className="row">
+                    <div id="user-name" className="col-3">
+                        <div className="container">
+                            <div className="row">
+                            <div className="col-3">
+                                <a><img className="avatar" src={this.state.user.image} /></a>
+                            </div>
+                                <div className="col-6 mt-1 pl-0">{this.state.user.name}</div>
+                                <div className="col-3 mt-1 pl-0"><a href='' className="logout" onClick={this.logout} >Log Out</a></div>
+                            </div>
                         </div>
-                        <div className="title">Chat</div>
                     </div>
-                    <ul className="messages">{this.chat()}</ul>
-                    <div className="bottom_wrapper clearfix">
+                    <div className="col-4">
                         <form onSubmit={this.handleSubmit}>
                             <div>
                                 <input className="message_input_wrapper" placeholder="Type your message here..."
@@ -101,32 +158,9 @@ export default class Chat extends Component {
                             </div>
                         </form>
                     </div>
-                </div>
-                <div className="message_template">
-                    <li className="message">
-                        <div className="avatar" />
-                        <div className="text_wrapper">
-                            <div className="text" />
-                        </div>
-                    </li>
+
                 </div>
             </div>
-
-            // <div>
-            //     <div>
-            //         Login in as: <strong>{this.state.user.email}</strong>
-            //     </div>
-            //     <div className="chats container bg-light">
-            //         {this.chat()}
-            //     </div>
-            //     <div>
-            // <form onSubmit={this.handleSubmit}>
-            //     <input onChange={this.handleChange} value={this.state.content}></input>
-            //     {this.state.error ? <p>{this.state.writeError}</p> : null}
-            //     <button type="submit">Send</button>
-            // </form>
-            //     </div>
-            // </div>
         )
     }
 }

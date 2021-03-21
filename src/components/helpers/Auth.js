@@ -10,9 +10,7 @@ export function signup(email, password) {
     const provider = new auth.GoogleAuthProvider();
     return auth().signInWithPopup(provider);
   }
-  export function signInWithGitHub() {
-    const provider = new auth.GithubAuthProvider();
-    return auth().signInWithPopup(provider);
+  export function logout() {
+    return auth().signOut();
   }
-
 
