@@ -22,7 +22,9 @@ export default class Signup extends Component {
     event.preventDefault();
     this.setState({ error: '' });
     try {
-      await signup(this.state.email, this.state.password);
+      await signup(
+        this.state.email, 
+        this.state.password);
     } catch (error) {
       this.setState({ error: error.message });
     }
