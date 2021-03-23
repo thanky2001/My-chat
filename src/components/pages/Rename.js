@@ -6,19 +6,52 @@ export default class Rename extends Component {
         super(props);
         
         this.state={
-            editName:this.props.user.name,
-            image:this.props.user.image,
+            values:{
+                editName:this.props.user.name,
+                image:this.props.user.image,
+            },
+            errors:{
+                editName:'',
+                image:''
+            },
         }
     }
     handleChange=(e)=>{
+        let errorMessage='';
+        if(e.target.value.trim()===''){
+            errorMessage='Không được để trống';
+        }
+        let value={...this.state.values,[e.target.name]:e.target.value}
+        let error={...this.state.errors,[e.target.name]:errorMessage}
         this.setState({
-            [e.target.name]:e.target.value,
-        },console.log(''))
-        
+            errors:error,
+            values:value,
+        })
+    }
+    checkErrors=()=>{
+        let {values,errors}=this.state;
+        let valid=true;
+        for(let key in values){
+            if(values[key]===''){
+                valid=false;
+            }
+        }
+        for(let key in errors){
+            if(errors[key]!==''){
+                valid=false;
+            }
+        }
+        //Thành công
+        if(valid){
+            let {renameUser}=this.props;
+            renameUser(this.state.values.editName,this.state.values.image);
+            alert('Thành công rồi');
+        }else{
+            alert('Không được để trống');
+            return;
+        }
     }
     render() {
-        let {user,renameUser}=this.props;
-        
         return (
             <div>
                 {/* Modal */}
@@ -32,25 +65,28 @@ export default class Rename extends Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <form>
+                                <form >
                                     <span>Name: </span>
                                     <input
-                                        placeholder={user.name}
+                                        placeholder={this.state.values.editName}
                                         name="editName" 
                                         type="text"
-                                        onChange={this.handleChange}
-                                    /><br/><br/>
-                                    <span>Url Image: </span>
-                                    <input
-                                        placeholder={user.image}
-                                        name="image"
-                                        type="text"
+                                        onBlur={this.handleChange}
                                         onChange={this.handleChange}
                                     />
+                                    <p className='text-danger'>{this.state.errors.editName}</p>
+                                    <br/><br/>
+                                    <span>Url Image: </span>
+                                    <input
+                                        placeholder={this.state.values.image}
+                                        name="image"
+                                        type="text"
+                                        onBlur={this.handleChange}
+                                        onChange={this.handleChange}
+                                    />
+                                    <p className='text-danger'>{this.state.errors.image}</p>
+                                    <button onClick={this.checkErrors} type="submit" className="btn btn-primary float-right" data-dismiss="modal" >Save</button>
                                 </form>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={()=>renameUser(this.state.editName,this.state.image)} >Save</button>
                             </div>
                         </div>
                     </div>
