@@ -10,15 +10,13 @@ export default class Chat extends Component {
         //Lấy dữ liệu từ Firebase
         this.state = {
             currentUser: auth().currentUser,
-            user: {},
+            user:{},
             listUser:[],
             chats: [],
             content: '',
             readError: null,
             writeError: null,
             ToChat:'',
-            editName:'',
-            image:'',
         };
     }
     componentDidMount = async () => {
@@ -43,42 +41,32 @@ export default class Chat extends Component {
         try {
             db.ref("user").on("value", snapshot => {
                 let listUser=[];
-                let user = {};
-                let acc=[];
+                let user={};
                 snapshot.forEach((snap) => {
-                    acc.push(snap.val());
-                    if (snap.val().uid === this.state.currentUser.uid) {
-                        user = snap.val();
-                    }else{
-                        listUser.push(snap.val());
-                    }
+                    listUser.push(snap.val());
                 },);
-                // đẩy dữ liệu lên firebase
-                let index=acc.filter(us=>us.uid===this.state.currentUser.uid);
-                if(index!==-1){
+                if(listUser.filter(us=>us.uid===this.state.currentUser.uid).length<0){
                     db.ref("user/" +this.state.currentUser.uid).set({
                         uid:this.state.currentUser.uid,
                         email:this.state.currentUser.email,
                         timestamp: Date.now(),
                         image:this.state.currentUser.photoURL,
                         name:this.state.currentUser.displayName,
-                    })
-                    }
-                    // else{
-                //     db.ref("user").push({
-                //         image:this.state.image,
-                //         name:this.state.editName,
-                //     });
-                // }
-                this.setState({
-                    user, 
+                    });    
+                }else{
+                    user=listUser.filter(us=>us.uid===this.state.currentUser.uid);
+                }
+                this.setState({ 
                     listUser,
+                    user:user[0],
                 });
-
+               
             });
         } catch (error) {
             this.setState({ readError: error.message });
         }
+        
+      
     }
     handleChange = (event) => {
         this.setState({
@@ -93,7 +81,7 @@ export default class Chat extends Component {
                 content: this.state.content,
                 timestamp: Date.now(),
                 touid:this.state.ToChat.uid,
-                uid: this.state.user.uid
+                uid: this.state.currentUser.uid
             });
             this.setState({ content: '' });
         } catch (error) {
@@ -118,12 +106,12 @@ export default class Chat extends Component {
         return this.state.chats.filter(chat=>(chat.uid===this.state.currentUser.uid||chat.uid===this.state.ToChat.uid)&& (chat.touid===this.state.ToChat.uid||chat.touid===this.state.currentUser.uid)).map(chat => {
             if(this.state.ToChat!==''){
              if (chat.content !== '') {
-                if (this.state.user.uid === chat.uid) {
+                if (this.state.currentUser.uid === chat.uid) {
                     return (
                         <li key={chat.timestamp} className="message right appeared">
                             <div>{
-                                !this.state.user.image ? <img className="avatar" src="./images/avatar.png"/>
-                                :<img className="avatar" src={this.state.user.image}/>
+                                !this.state.currentUser.image ? <img className="avatar" src="./images/avatar.png"/>
+                                :<img className="avatar" src={this.state.currentUser.image}/>
                                 }</div>
                             <div className="text_wrapper">
                                 <div className="text">{chat.content}</div>
@@ -149,13 +137,25 @@ export default class Chat extends Component {
     }
     //rename user
     renameUser=(editName,image)=>{
-        this.setState({
-            editName,
-            image,
-        },()=>console.log(this.state.editName))
+        db.ref("user/" +this.state.currentUser.uid).set({
+            name: editName,
+            image: image,
+            uid:this.state.currentUser.uid,
+            email:this.state.currentUser.email,
+            timestamp: Date.now(),
+          }, (error) => {
+            if (error) {
+              alert('lỗi rồi')
+            } else {
+                alert('thành công rồi');
+
+            }   
+          });
     }
+    
     renderListChat=()=>{
         return this.state.listUser.map((ob,index)=>{
+            if(ob.uid!==this.state.user.uid){
                 if(!ob.name){
                     return (
                         <div onClick={()=>{this.getToChat(ob)}} 
@@ -179,7 +179,7 @@ export default class Chat extends Component {
                         </div>
                     )
                 }
-            
+            }
         })
     }
     render() {
@@ -191,7 +191,7 @@ export default class Chat extends Component {
                         <div className="container">
                             <div className="row">
                                 <div className="col-3">
-                                    <a href="#" data-toggle="modal" data-target="#modelId">{
+                                    <a href="#" onClick={this.handleOpendModal} data-toggle="modal" data-target="#modelId">{
                                         !this.state.user.image ? <img className="avatar" src="./images/avatar.png"/>
                                         :<img className="avatar" src={this.state.user.image}/>
                                     }
@@ -207,9 +207,9 @@ export default class Chat extends Component {
                                 <div  className="col-9">
                                     <input type="text" id="contacts-search-input" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" />
                                 </div>
-                                <div className="col-3 mt-2"><i style={{cursor:'pointer'}} class="fas fa-user-plus"></i></div>
+                                <div className="col-3 mt-2"><i style={{cursor:'pointer'}} className="fas fa-user-plus"></i></div>
                             </div>
-                            <div class="contacts">
+                            <div className="contacts">
                                 <div>
                                     <span>Chat</span>
                                 </div>

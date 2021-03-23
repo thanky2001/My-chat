@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
 import '../../Css/rename.css';
 export default class Rename extends Component {
+    
     constructor(props) {
         super(props);
+        
         this.state={
-            editName:'',
-            image:''
+            editName:this.props.user.name,
+            image:this.props.user.image,
         }
     }
     handleChange=(e)=>{
         this.setState({
             [e.target.name]:e.target.value,
-        })
+        },console.log(''))
         
     }
     render() {
         let {user,renameUser}=this.props;
+        
         return (
             <div>
                 {/* Modal */}
@@ -47,8 +50,7 @@ export default class Rename extends Component {
                                 </form>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" className="btn btn-primary" onClick={()=>renameUser(this.state.editName,this.state.image)} >Save</button>
+                                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={()=>renameUser(this.state.editName,this.state.image)} >Save</button>
                             </div>
                         </div>
                     </div>
