@@ -28,7 +28,6 @@ export default class HeaderChat extends Component {
     }
     
     render() {
-        console.log(this.state.user);
         return (
             <div className="row">
                 <div className="col-3">

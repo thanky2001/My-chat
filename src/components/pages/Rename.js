@@ -7,8 +7,8 @@ export default class Rename extends Component {
         
         this.state={
             values:{
-                editName:this.props.user.name,
-                image:this.props.user.image,
+                editName:'',
+                image:'',
             },
             errors:{
                 editName:'',

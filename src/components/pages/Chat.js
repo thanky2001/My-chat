@@ -10,8 +10,8 @@ export default class Chat extends Component {
         //Lấy dữ liệu từ Firebase
         this.state = {
             currentUser: auth().currentUser,
-            user: {},
             listUser: [],
+            user:{},
             chats: [],
             content: '',
             readError: null,
@@ -42,6 +42,15 @@ export default class Chat extends Component {
                         name: this.state.currentUser.displayName || this.state.currentUser.email,
                     });
                 }
+                //lấy dữ liệu mảng user
+                db.ref('user/' + auth().currentUser.uid)
+                    .get()
+                    .then(dt => {
+                        let user = dt.val();
+                        this.setState({
+                            user
+                        })
+                    })
                 this.setState({
                     listUser,
                     isLoading: false,
@@ -61,7 +70,7 @@ export default class Chat extends Component {
                 readError: error.message
             });
         }
-        //lấy dữ liệu mảng user
+
 
     }
     handleChange = (event) => {
@@ -103,8 +112,8 @@ export default class Chat extends Component {
                         return (
                             <li key={chat.timestamp} className="message right appeared">
                                 <div>{
-                                    !this.state.currentUser.image ? <img className="avatar" src="./images/avatar.png" />
-                                        : <img className="avatar" src={this.state.currentUser.image} />
+                                    !this.state.user.image ? <img className="avatar" src="./images/avatar.png" />
+                                        : <img className="avatar" src={this.state.user.image} />
                                 }</div>
                                 <div className="text_wrapper">
                                     <div className="text">{chat.content}</div>
@@ -212,7 +221,8 @@ export default class Chat extends Component {
 
                                     <div>
                                         <ul id="scroll" className="messages">{this.chat()}</ul>
-                                        <form onSubmit={this.handleSubmit}>
+                                    </div>
+                                    <form className='footer__message' onSubmit={this.handleSubmit}>
                                             <div className="bottom_wrapper">
                                                 <input className="message_input_wrapper" placeholder="Type your message here..."
                                                     onChange={this.handleChange} value={this.state.content}></input>
@@ -221,9 +231,7 @@ export default class Chat extends Component {
                                                     <button className="btn--send" type="submit">Send</button>
                                                 </div>
                                             </div>
-                                        </form>
-                                    </div>
-
+                                    </form>
                                 </div>
 
                             </div>

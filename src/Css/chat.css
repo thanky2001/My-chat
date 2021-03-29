@@ -77,13 +77,14 @@ body{
 }
 .contacts__list{
     cursor: pointer;
-    height: 518px;
+    height: 70vh;
     overflow-y: scroll;
-    width: fit-content;
+    width: 100%;
     scrollbar-width: none;
 }
 .message__container{
     width: 100%;
+    height: 100vh;
     background-color: #fff;
     padding: 0;
 }
@@ -92,7 +93,7 @@ body{
     width: 100%;
     margin: 0;
     padding: 0;
-    height: 80px;
+    height: 5em;
     box-shadow: 1px 2px 3px #bcbdc0;
 }
 .header__message p{
@@ -106,8 +107,8 @@ body{
     list-style: none;
     padding: 20px 10px 0 10px;
     margin: 0;
-    height: 500px;
-    overflow: scroll;
+    height:80vh;
+    overflow-y: scroll;
   }
 .messages .message {
     clear: both;
@@ -202,11 +203,12 @@ body{
   }
   
   .bottom_wrapper {
-    position: relative;
     width: 100%;
+    height: 70px;
     background-color: #fff;
     padding: 20px 20px;
     position: absolute;
+    bottom: 0;
   }
   
   .bottom_wrapper .message_input_wrapper {
